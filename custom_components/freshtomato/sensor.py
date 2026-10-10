@@ -334,10 +334,10 @@ async def async_setup_entry(
         and bool(_lan1_ip) and _lan1_ip not in ("", "0.0.0.0")
     )
     # bridge_ifname is the LAN bridge carrying the WET uplink (e.g. "br1")
-    _bridge_ifname  = nvram.get("lan1_ifname", "br1") or "br1"
+    _bridge_ifname  = nvram.get("lan1_ifname", "br1")
     # bridge_iface is the physical/VLAN interface for bandwidth measurement
     # lan1_ifnames example: "vlan3 eth1" → use the first token
-    _bridge_bw_iface = (nvram.get("lan1_ifnames", "") or "").split()[0] or _bridge_ifname
+    _bridge_bw_iface = nvram.get("lan1_ifnames", _bridge_ifname).split()[0]
 
     # ── WAN sensors (per-WAN for multi-WAN; legacy single for single-WAN) ──
     # mwan_num tells us how many WAN ports are configured; default is 1.
