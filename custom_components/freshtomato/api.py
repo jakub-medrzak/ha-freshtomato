@@ -199,7 +199,6 @@ class FreshTomatoAPI:
         """Reboot the router via the FreshTomato admin CGI."""
         await self._post_tomato_cgi(f"_http_id={self._http_id}&_reboot=1")
 
-
     async def fetch_devlist(self) -> dict[str, Any]:
         """Fetch exec=devlist — returns wldev, wlnoise, dhcpd_lease, arplist,
         nvram subset, etherstates, gc_time in one response."""
