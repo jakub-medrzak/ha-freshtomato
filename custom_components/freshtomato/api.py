@@ -93,7 +93,13 @@ class FreshTomatoAPI:
             await self._session.close()
 
     async def _post_update_cgi(self, body: str) -> str:
-        url = f"{self._base_url}/update.cgi"
+        return await self._post_cgi("update.cgi", body)
+
+    async def _post_tomato_cgi(self, body: str) -> str:
+        return await self._post_cgi("tomato.cgi", body)
+
+    async def _post_cgi(self, endpoint: str, body: str) -> str:
+        url = f"{self._base_url}/{endpoint}"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Referer":      f"{self._base_url}/status-overview.asp",
@@ -171,33 +177,6 @@ class FreshTomatoAPI:
     async def test_connection(self) -> bool:
         await self._post_update_cgi(f"_http_id={self._http_id}&exec=devlist")
         return True
-
-    async def _post_tomato_cgi(self, body: str) -> str:
-        url = f"{self._base_url}/tomato.cgi"
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Referer":      f"{self._base_url}/status-overview.asp",
-        }
-        _LOGGER.debug("POST %s  body=%r", url, body)
-        try:
-            async with self._session.post(url, data=body, headers=headers) as resp:
-                resp.raise_for_status()
-                text = await resp.text()
-                _LOGGER.debug(
-                    "POST %s  status=%d  response=\n%s",
-                    url, resp.status, text,
-                )
-                return text
-        except aiohttp.ClientResponseError as err:
-            if err.status in (401, 403):
-                raise InvalidAuth(f"Auth failed: {err}") from err
-            raise CannotConnect(f"HTTP error {err.status}: {err}") from err
-        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
-            raise CannotConnect(f"Connection error: {err}") from err
-
-    async def reboot(self) -> None:
-        """Reboot the router via the FreshTomato admin CGI."""
-        await self._post_tomato_cgi(f"_http_id={self._http_id}&_reboot=1")
 
     async def fetch_devlist(self) -> dict[str, Any]:
         """Fetch exec=devlist — returns wldev, wlnoise, dhcpd_lease, arplist,
@@ -391,6 +370,9 @@ class FreshTomatoAPI:
         _LOGGER.debug("fetch_about_page: no version found in about.asp")
         return None
 
+    async def reboot(self) -> None:
+        """Reboot the router via the FreshTomato admin CGI."""
+        await self._post_tomato_cgi(f"_http_id={self._http_id}&_reboot=1")
 
 
 class CannotConnect(Exception):
