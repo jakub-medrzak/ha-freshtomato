@@ -87,7 +87,7 @@ One `device_tracker` entity per discovered client MAC address. Wireless and wire
 ### Via HACS (recommended)
 
 1. In HACS go to **Integrations → ⋮ → Custom repositories**
-2. Add `https://github.com/mx5gr/ha-freshtomato` with category **Integration**
+2. Add `https://github.com/jakub-medrzak/ha-freshtomato` with category **Integration**
 3. Click **Download**
 4. Restart Home Assistant
 
